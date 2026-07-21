@@ -3,7 +3,7 @@
 
   var Defined = {
     api: 'collaps',
-    localhost: 'http://localhost/',
+    localhost: 'http://localhost:5000/',
     apn: ''
   };
 
