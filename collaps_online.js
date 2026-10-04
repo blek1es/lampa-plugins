@@ -26,17 +26,24 @@
         + '<span>Смотреть онлайн</span>'
         + '</div>';
 
-    // ─── CSS ─────────────────────────────────────────────────────────────────
+    // ─── CSS (оптимизировано для Smart TV) ──────────────────────────────────
     $('head').append('<style id="collaps-online-style">'
-        + '.collaps-wrap{display:flex;flex-direction:column;width:100%;height:100%;background:#141519}'
-        + '.collaps-player{flex:1;position:relative;background:#000;min-height:0}'
-        + '.collaps-iframe{position:absolute;inset:0;width:100%;height:100%;border:none}'
-        + '.collaps-loader{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;'
-        +   'justify-content:center;gap:1em;background:#141519}'
-        + '.collaps-spin{width:2.5em;height:2.5em;border:.25em solid rgba(255,255,255,.15);'
-        +   'border-top-color:#e8a838;border-radius:50%;animation:collaps-spin .7s linear infinite}'
-        + '.collaps-msg{font-size:.9em;color:rgba(255,255,255,.4)}'
-        + '@keyframes collaps-spin{to{transform:rotate(360deg)}}'
+        + '.collaps-wrap{display:-webkit-box;display:-webkit-flex;display:flex;'
+        +   '-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;flex-direction:column;'
+        +   'width:100%;height:100%;background:#141519}'
+        + '.collaps-player{-webkit-box-flex:1;-webkit-flex:1;flex:1;position:relative;background:#000;min-height:0}'
+        + '.collaps-iframe{position:absolute;top:0;left:0;right:0;bottom:0;width:100%;height:100%;border:none}'
+        + '.collaps-loader{position:absolute;top:0;left:0;right:0;bottom:0;display:-webkit-box;display:-webkit-flex;display:flex;'
+        +   '-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;flex-direction:column;'
+        +   '-webkit-box-align:center;-webkit-align-items:center;align-items:center;'
+        +   '-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;'
+        +   'background:#141519}'
+        + '.collaps-spin{width:2.5em;height:2.5em;margin-bottom:1em;border:.25em solid rgba(255,255,255,.15);'
+        +   'border-top-color:#e8a838;border-radius:50%;'
+        +   '-webkit-animation:collaps-spin .7s linear infinite;animation:collaps-spin .7s linear infinite}'
+        + '.collaps-msg{font-size:.9em;color:rgba(255,255,255,.4);text-align:center;padding:0 2em}'
+        + '@-webkit-keyframes collaps-spin{to{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}'
+        + '@keyframes collaps-spin{to{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}'
         + '</style>');
 
     // ─── Компонент ───────────────────────────────────────────────────────────
@@ -54,7 +61,7 @@
         // ── Зона плеера ──
         var $player = $('<div class="collaps-player"></div>');
         $loader = $('<div class="collaps-loader"><div class="collaps-spin"></div><div class="collaps-msg">Загрузка...</div></div>');
-        $iframe = $('<iframe class="collaps-iframe" allowfullscreen allow="autoplay; fullscreen" referrerpolicy="no-referrer"></iframe>');
+        $iframe = $('<iframe class="collaps-iframe" allowfullscreen allow="autoplay; fullscreen; encrypted-media" referrerpolicy="no-referrer" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"></iframe>');
         $iframe.hide();
         $player.append($loader, $iframe);
         $root.append($player);
@@ -121,7 +128,19 @@
 
             var $btn = $(BUTTON_HTML);
 
+            // Поддержка событий Lampa (hover:enter)
             $btn.on('hover:enter', function () {
+                Lampa.Activity.push({
+                    url:       '',
+                    title:     'Онлайн: ' + (movie.title || movie.name || ''),
+                    component: 'collaps_online',
+                    movie:     movie,
+                    page:      1
+                });
+            });
+
+            // Добавляем поддержку клика для Smart TV (в дополнение к hover:enter)
+            $btn.on('click', function () {
                 Lampa.Activity.push({
                     url:       '',
                     title:     'Онлайн: ' + (movie.title || movie.name || ''),
