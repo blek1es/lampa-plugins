@@ -57,6 +57,7 @@
         var $loader   = null;
         var loadTimer = null;
         var destroyed = false;
+        var keyHandler = null;
 
         // ── Зона плеера ──
         var $player = $('<div class="collaps-player"></div>');
@@ -65,6 +66,22 @@
         $iframe.hide();
         $player.append($loader, $iframe);
         $root.append($player);
+
+        // ── Обработка клавиш пульта ДУ ──
+        keyHandler = function(e) {
+            if (destroyed) return;
+
+            // Back / Escape - выход из плеера
+            if (e.keyCode === 27 || e.keyCode === 8 || e.keyCode === 10009 || e.keyCode === 461) {
+                e.preventDefault();
+                e.stopPropagation();
+                Lampa.Activity.backward();
+                return false;
+            }
+        };
+
+        // Привязываем обработчик клавиш
+        $(document).on('keydown', keyHandler);
 
         this.load = function () {
             if (destroyed) return;
@@ -108,6 +125,13 @@
         this.destroy = function () {
             destroyed = true;
             clearTimeout(loadTimer);
+
+            // Отключаем обработчик клавиш
+            if (keyHandler) {
+                $(document).off('keydown', keyHandler);
+                keyHandler = null;
+            }
+
             if ($iframe) $iframe.attr('src', 'about:blank');
         };
     }
@@ -128,7 +152,7 @@
 
             var $btn = $(BUTTON_HTML);
 
-            // Поддержка событий Lampa (hover:enter)
+            // Поддержка событий Lampa (hover:enter) и клавиш пульта
             $btn.on('hover:enter', function () {
                 Lampa.Activity.push({
                     url:       '',
@@ -139,8 +163,9 @@
                 });
             });
 
-            // Добавляем поддержку клика для Smart TV (в дополнение к hover:enter)
-            $btn.on('click', function () {
+            // Добавляем поддержку клика и Enter для Smart TV
+            $btn.on('click', function (e) {
+                e.preventDefault();
                 Lampa.Activity.push({
                     url:       '',
                     title:     'Онлайн: ' + (movie.title || movie.name || ''),
@@ -148,6 +173,20 @@
                     movie:     movie,
                     page:      1
                 });
+            });
+
+            // Обработка Enter на кнопке
+            $btn.on('keydown', function (e) {
+                if (e.keyCode === 13) { // Enter
+                    e.preventDefault();
+                    Lampa.Activity.push({
+                        url:       '',
+                        title:     'Онлайн: ' + (movie.title || movie.name || ''),
+                        component: 'collaps_online',
+                        movie:     movie,
+                        page:      1
+                    });
+                }
             });
 
             // Вставляем после кнопки торрент
