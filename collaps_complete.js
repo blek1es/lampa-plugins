@@ -410,13 +410,13 @@
                     if (!extra.file && get_links_wait) { Lampa.Noty.show(Lampa.Lang.translate('online_waitlink')); return; }
                     if (!extra.file)                   { Lampa.Noty.show(Lampa.Lang.translate('online_nolink'));   return; }
 
-                    var first    = { url: extra.file, quality: extra.quality || false, timeline: view, title: element.season ? element.title : (object.movie.title + (element.title ? ' / ' + element.title : '')) };
+                    var first    = { url: extra.file, type: 'hls', quality: extra.quality || false, timeline: view, title: element.season ? element.title : (object.movie.title + (element.title ? ' / ' + element.title : '')) };
                     var playlist = [];
 
                     if (element.season) {
                         items.forEach(function (e) {
                             var r = getBestFile(e);
-                            playlist.push({ title: e.title, url: r.file, quality: r.quality || false, timeline: e.timeline });
+                            playlist.push({ title: e.title, url: r.file, type: 'hls', quality: r.quality || false, timeline: e.timeline });
                         });
                     } else { playlist.push(first); }
 
