@@ -151,14 +151,18 @@
                     if (!element.file) { Lampa.Noty.show(Lampa.Lang.translate('online_nolink')); return; }
 
                     var playlist = [];
-                    // ИСПРАВЛЕНИЕ: добавлен type: 'hls'
+                    // ИСПРАВЛЕНИЕ: добавлен type: 'hls' и другие параметры
                     var first    = {
                         url: element.file,
                         type: 'hls',
+                        manifest: 'm3u8',
                         timeline: view,
                         title: element.season ? element.title : (element.voice ? object.movie.title + ' / ' + element.title : element.title),
                         subtitles: element.subtitles
                     };
+
+                    console.log('[Collaps] Play URL:', element.file);
+                    console.log('[Collaps] Play Object:', first);
 
                     if (element.season) {
                         items.forEach(function (elem) {
@@ -166,6 +170,7 @@
                                 title: elem.title,
                                 url: elem.file,
                                 type: 'hls',
+                                manifest: 'm3u8',
                                 timeline: elem.timeline,
                                 subtitles: elem.subtitles
                             });
@@ -173,8 +178,15 @@
                     } else { playlist.push(first); }
 
                     if (playlist.length > 1) first.playlist = playlist;
-                    Lampa.Player.play(first);
-                    Lampa.Player.playlist(playlist);
+
+                    // Пробуем разные способы запуска
+                    try {
+                        Lampa.Player.play(first);
+                        Lampa.Player.playlist(playlist);
+                    } catch(e) {
+                        console.error('[Collaps] Player error:', e);
+                        Lampa.Noty.show('Ошибка запуска плеера: ' + e.message);
+                    }
 
                     if (viewed.indexOf(hash_file) === -1) {
                         viewed.push(hash_file);
